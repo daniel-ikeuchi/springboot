@@ -1,5 +1,6 @@
 package com.example.springboot;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +13,20 @@ import com.example.springboot.domain.Cidade;
 import com.example.springboot.domain.Cliente;
 import com.example.springboot.domain.Endereco;
 import com.example.springboot.domain.Estado;
+import com.example.springboot.domain.Pagamento;
+import com.example.springboot.domain.PagamentoComBoleto;
+import com.example.springboot.domain.PagamentoComCartao;
+import com.example.springboot.domain.Pedido;
 import com.example.springboot.domain.Produto;
+import com.example.springboot.domain.enums.EstadoPagamento;
 import com.example.springboot.domain.enums.TipoCliente;
 import com.example.springboot.reposistories.CategoriaRepository;
 import com.example.springboot.reposistories.CidadeRepository;
 import com.example.springboot.reposistories.ClienteRepository;
 import com.example.springboot.reposistories.EnderecoRepository;
 import com.example.springboot.reposistories.EstadoRepository;
+import com.example.springboot.reposistories.PagamentoRepository;
+import com.example.springboot.reposistories.PedidoRepository;
 import com.example.springboot.reposistories.ProdutoRepository;
 
 @SpringBootApplication
@@ -26,21 +34,20 @@ public class SpringbootApplication implements CommandLineRunner {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;
-	
 	@Autowired
 	private ProdutoRepository produtoRepository;
-	
 	@Autowired
 	private EstadoRepository estadoRepository;
-	
 	@Autowired
 	private CidadeRepository cidadeRepository;
-	
 	@Autowired
 	private ClienteRepository clienteRepository;
-	
 	@Autowired
 	private EnderecoRepository enderecoRepository;
+	@Autowired
+	private PedidoRepository pedidoRepository;
+	@Autowired
+	private PagamentoRepository pagamentoRepository;
 	
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootApplication.class, args);
@@ -88,6 +95,23 @@ public class SpringbootApplication implements CommandLineRunner {
 		
 		clienteRepository.saveAll(Arrays.asList(cli1));
 		enderecoRepository.saveAll(Arrays.asList(e1, e2));
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		
+		Pedido ped1 = new Pedido(null, sdf.parse("30/05/2022 10:32"), cli1, e1);
+		Pedido ped2 = new Pedido(null, sdf.parse("01/06/2022 19:35"), cli1, e2);
+		
+		Pagamento pagto1 = new PagamentoComCartao(null, EstadoPagamento.QUITADO, ped1, 6);
+		Pagamento pagto2 = new PagamentoComBoleto(null, EstadoPagamento.PENDENTE, ped2, sdf.parse("20/06/2022 00:00"), null);
+
+		ped1.setPagamento(pagto1);
+		ped2.setPagamento(pagto2);
+		
+		cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+
+		pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
+		pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
+		
 	}
 
 }
