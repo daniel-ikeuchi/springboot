@@ -21,6 +21,11 @@ public class CategoriaService {
 
 	@Autowired
 	private CategoriaRepository repo;
+	
+	public Categoria insert(Categoria obj) {
+		obj.setId(null);
+		return repo.save(obj);
+	}
 
 	public Categoria find(Integer id) {
 		Optional<Categoria> obj = repo.findById(id);
@@ -28,16 +33,10 @@ public class CategoriaService {
 				"Objeto não encontrado! Id: " + id + " - Tipo: " + Categoria.class.getName()));
 	}
 
-	public Categoria insert(Categoria obj) {
-		obj.setId(null);
-		Categoria savedObj = repo.save(obj);
-		return savedObj;
-	}
-
-	public Categoria update(Categoria obj) {
-		Categoria dbObj = find(obj.getId());
-		updateData(dbObj, obj);
-		return repo.save(dbObj);
+	public Categoria update(Categoria objDto) {
+		Categoria objDb = find(objDto.getId());
+		updateData(objDb, objDto);
+		return repo.save(objDb);
 	}
 
 	public void delete(Integer id) {
@@ -59,12 +58,12 @@ public class CategoriaService {
 	  return repo.findAll(pageRequest);
 	}
 	
-	public Categoria fromDTO(CategoriaDTO dto) {
-		return new Categoria(dto.getId(), dto.getNome());
+	public Categoria fromDTO(CategoriaDTO objDto) {
+		return new Categoria(objDto.getId(), objDto.getNome());
 	}
 
-	private void updateData(Categoria dbObj, Categoria obj) {
-		dbObj.setNome(obj.getNome());
+	private void updateData(Categoria objDb, Categoria objDto) {
+		objDb.setNome(objDto.getNome());
 	}
 
 }
